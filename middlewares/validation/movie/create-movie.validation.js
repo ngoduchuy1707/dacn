@@ -58,7 +58,7 @@ module.exports.validateCreateMovie = async (req, res, next) => {
     //     "any.required": "Genre invalid",
     //     "string.pattern.base": "Genre invalid"
     // })
-    launchDate: Joi.string()
+    launchDate: Joi.date()
       //.pattern(new RegExp("^[0-9]{1,2}[-|/][0-9]{1,2}[-|/][0-9999]{4}$"))
       .label("LaunchDate")
       .required(),
