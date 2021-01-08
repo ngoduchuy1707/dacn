@@ -44,6 +44,7 @@ const seatCodeArray = [
 // GET THEATERS
 module.exports.getTheaters = async (req, res, next) => {
   try {
+    let res;
     const [theaters, count] = await Promise.all([
       Theaters.find(),
       Theaters.countDocuments(),
@@ -59,11 +60,11 @@ module.exports.getTheaters = async (req, res, next) => {
       };
     } 
     else {
-      // theaters.forEach(async (key)=>{
-      //     const res=await Cinema.findById(key.cinema_id)
-      //   //console.log("res: ",res.cinema_Name);
+      theaters.forEach(async (key)=>{
+          res=await Cinema.findById(key.cinema_id)
+        
 
-      // })
+      })
       return res.json({
         message: errorResult.success,
         data: theaters,
