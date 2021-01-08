@@ -8,19 +8,27 @@ const { Cinema } = require("../models/cinema.model");
 //GET SESSION
 module.exports.getSession = async (req, res, next) => {
   try {
+    let data={};
     const session = await Session.find();
     if (!session) {
       throw {
         error: errorResult.badRequest,
       };
+    } else {
+      const cinema = await Cinema.find({ _id: session.cinema_id });
+      const theaters = await Theaters.find({ _id: session.theaters_id });
+      const movie = await Movie.find({ _id: session.movie_id });
+      data={
+        ...session,
+        cinemaName:cinema.cinema_Name,
+        theatersName:theaters.theaters_Name,
+        movieName:movie.name
+      }
+      return res.json({
+        message: errorResult.success,
+        data: session,
+      });
     }
-    if (session.length < 1) {
-      throw { error: null };
-    }
-    return res.json({
-      message: errorResult.success,
-      data: session,
-    });
   } catch (error) {
     return res.json(error);
   }

@@ -81,6 +81,7 @@ module.exports.getTheaters = async (req, res, next) => {
           })
         }
       })
+      console.log("heroku");
       return res.json({
         message: errorResult.success,
         data: data,
