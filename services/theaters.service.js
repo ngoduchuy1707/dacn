@@ -44,32 +44,49 @@ const seatCodeArray = [
 // GET THEATERS
 module.exports.getTheaters = async (req, res, next) => {
   try {
-    let res;
     const [theaters, count] = await Promise.all([
       Theaters.find(),
-      Theaters.countDocuments(),
+      Theaters.countDocuments()
+    ]);
+    const [cinemas] = await Promise.all([
+      Cinema.find(),
     ]);
     if (!theaters) {
       throw {
         error: errorResult.badRequest,
       };
     }
-    if (theaters.length < 1) {
-      throw {
-        error: null,
-      };
-    } 
     else {
-      theaters.forEach(async (key)=>{
-          res=await Cinema.findById(key.cinema_id)
-        
 
+      // theaters.forEach(async(key) => {
+      //   let temp = await Cinema.findById(key.cinema_id);
+      //   cinemaRecords.push(temp.cinema_Name)
+      // })
+      let cinemaRecords = [];
+      let cinemaRecord = {};
+      let data = [];
+      theaters.map((theater, index) => {
+        cinemaRecord = cinemas.find((cinema) => {
+          return (cinema._id).toString() === (theater.cinema_id).toString()
+        })
+        cinemaRecords.push(cinemaRecord)
+        if (cinemaRecords.length === theaters.length) {
+          
+          theaters.map((theater, index) => {
+            theater = {
+              ...theater._doc,
+              cinema_Name: cinemaRecords[index].cinema_Name
+            }
+            data.push(theater)
+          })
+        }
       })
       return res.json({
         message: errorResult.success,
-        data: theaters,
-        total_page: count
+        data: data,
+        total_page: count,
       });
+
     }
   } catch (error) {
     return res.json(error);
