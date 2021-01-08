@@ -59,11 +59,11 @@ module.exports.getTheaters = async (req, res, next) => {
       };
     } 
     else {
-      theaters.forEach(async (key)=>{
-          const res=await Cinema.findById(key.cinema_id)
-        //console.log("res: ",res.cinema_Name);
+      // theaters.forEach(async (key)=>{
+      //     const res=await Cinema.findById(key.cinema_id)
+      //   //console.log("res: ",res.cinema_Name);
 
-      })
+      // })
       return res.json({
         message: errorResult.success,
         data: theaters,
