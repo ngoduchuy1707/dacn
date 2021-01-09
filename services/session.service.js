@@ -8,25 +8,58 @@ const { Cinema } = require("../models/cinema.model");
 //GET SESSION
 module.exports.getSession = async (req, res, next) => {
   try {
-    let data={};
-    const session = await Session.find();
-    if (!session) {
+    const [sessions, count, cinemas, theaters] = await Promise.all([
+      Session.find(),
+      Session.countDocuments(),
+      Cinema.find(),
+      Theaters.find(),
+    ]);
+    if (!sessions) {
       throw {
-        error: errorResult.badRequest,
+        error: errorResult.notFound,
       };
     } else {
-      const cinema = await Cinema.find({ _id: session.cinema_id });
-      const theaters = await Theaters.find({ _id: session.theaters_id });
-      const movie = await Movie.find({ _id: session.movie_id });
-      data={
-        ...session,
-        cinemaName:cinema.cinema_Name,
-        theatersName:theaters.theaters_Name,
-        movieName:movie.name
-      }
+      let theaterRecords = [];
+      let theaterRecord = {};
+      let cinemaRecords = [];
+      let cinemaRecord = {};
+      let data = [];
+      let dataFinal = [];
+      let record = {};
+      sessions.map((session, index) => {
+        theaterRecord = theaters.find((theater) => {
+          return (theater._id).toString() === (session.theaters_id).toString()
+        })
+        theaterRecords.push(theaterRecord);
+        if (theaterRecords.length === sessions.length) {
+          sessions.map((session, index) => {
+            record = {
+              ...session._doc,
+              theater_Name: theaterRecords[index].theaters_Name,
+            }
+            data.push(record);
+          })
+        }
+        cinemaRecord = cinemas.find((cinema) => {
+          return (cinema._id).toString() === (session.cinema_id).toString()
+        })
+        cinemaRecords.push(cinemaRecord);
+        if (cinemaRecords.length === data.length) {
+          data.map((item, index) => {
+            item = {
+              ...item,
+              cinema_Name : cinemaRecords[index].cinema_Name,
+              cinema_Address : cinemaRecords[index].address
+            }
+            dataFinal.push(item)
+          })
+        }
+      })
+      console.log('dataFinal: ', dataFinal);
       return res.json({
         message: errorResult.success,
-        data: session,
+        data: dataFinal,
+        total_page: count
       });
     }
   } catch (error) {

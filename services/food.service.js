@@ -8,14 +8,15 @@ module.exports.getFood = async (req, res, next) => {
   try {
     const [food, count] = await Promise.all([
       Food.find().sort({ price: -1 }),
-      Food.count(),
+      Food.countDocuments(),
     ]);
 
-    if (!food || (food && food.length < 1)) {
+    if (!food) {
       throw {
         error: errorResult.notFound,
       };
-    } else {
+    }
+    else {
       return res.json({
         message: errorResult.success,
         data: food,
@@ -31,7 +32,7 @@ module.exports.getFood = async (req, res, next) => {
 module.exports.getFoodById = async (req, res, next) => {
   try {
     const { foodId } = req.params;
-    const food = await Bill.findById(foodId);
+    const food = await Food.findById(foodId);
     if (!food) {
       throw {
         error: errorResult.notFound,
@@ -70,10 +71,10 @@ module.exports.createFood = async (req, res, next) => {
 module.exports.updateFood = async (req, res, next) => {
   try {
     const { foodId } = req.params;
-    const { food_Name, food_Price, quantity, desc } = req.body;
+    const { food_Name, price, quantity, desc } = req.body;
     const food = await Food.findByIdAndUpdate(
       { _id: foodId },
-      { food_Name, food_Price, quantity, desc },
+      { food_Name, price, quantity, desc },
       { new: true }
     );
     if (!food) {

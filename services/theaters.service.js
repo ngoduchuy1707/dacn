@@ -57,14 +57,10 @@ module.exports.getTheaters = async (req, res, next) => {
       };
     }
     else {
-
-      // theaters.forEach(async(key) => {
-      //   let temp = await Cinema.findById(key.cinema_id);
-      //   cinemaRecords.push(temp.cinema_Name)
-      // })
       let cinemaRecords = [];
       let cinemaRecord = {};
       let data = [];
+      console.log("theaters: ",typeof theaters);
       theaters.map((theater, index) => {
         cinemaRecord = cinemas.find((cinema) => {
           return (cinema._id).toString() === (theater.cinema_id).toString()
@@ -81,7 +77,6 @@ module.exports.getTheaters = async (req, res, next) => {
           })
         }
       })
-      console.log("heroku");
       return res.json({
         message: errorResult.success,
         data: data,
