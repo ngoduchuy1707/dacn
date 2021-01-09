@@ -8,57 +8,18 @@ const { Cinema } = require("../models/cinema.model");
 //GET SESSION
 module.exports.getSession = async (req, res, next) => {
   try {
-    const [sessions, count, cinemas, theaters] = await Promise.all([
-      Session.find(),
+    const [sessions, count] = await Promise.all([
+      Session.find().populate('movie_id cinema_id theaters_id'),
       Session.countDocuments(),
-      Cinema.find(),
-      Theaters.find(),
     ]);
     if (!sessions) {
       throw {
         error: errorResult.notFound,
       };
     } else {
-      let theaterRecords = [];
-      let theaterRecord = {};
-      let cinemaRecords = [];
-      let cinemaRecord = {};
-      let data = [];
-      let dataFinal = [];
-      let record = {};
-      sessions.map((session, index) => {
-        theaterRecord = theaters.find((theater) => {
-          return (theater._id).toString() === (session.theaters_id).toString()
-        })
-        theaterRecords.push(theaterRecord);
-        if (theaterRecords.length === sessions.length) {
-          sessions.map((session, index) => {
-            record = {
-              ...session._doc,
-              theater_Name: theaterRecords[index].theaters_Name,
-            }
-            data.push(record);
-          })
-        }
-        cinemaRecord = cinemas.find((cinema) => {
-          return (cinema._id).toString() === (session.cinema_id).toString()
-        })
-        cinemaRecords.push(cinemaRecord);
-        if (cinemaRecords.length === data.length) {
-          data.map((item, index) => {
-            item = {
-              ...item,
-              cinema_Name : cinemaRecords[index].cinema_Name,
-              cinema_Address : cinemaRecords[index].address
-            }
-            dataFinal.push(item)
-          })
-        }
-      })
-      console.log('dataFinal: ', dataFinal);
       return res.json({
         message: errorResult.success,
-        data: dataFinal,
+        data: sessions,
         total_page: count
       });
     }
@@ -80,6 +41,30 @@ module.exports.getSessionById = async (req, res, next) => {
       return res.json({
         message: errorResult.success,
         data: session,
+      });
+    }
+  } catch (error) {
+    return res.json(error);
+  }
+};
+
+//GET SESSION BY ID
+module.exports.getSessionByMovieId = async (req, res, next) => {
+  try {
+    const { movieId } = req.params;
+    const [session, count] = await Promise.all([
+      Session.find({ movie_id: movieId }).populate('cinema_id'),
+      Session.countDocuments()
+    ])
+    if (!session) {
+      throw {
+        error: errorResult.notFound,
+      };
+    } else {
+      return res.json({
+        message: errorResult.success,
+        data: session,
+        total_page: count
       });
     }
   } catch (error) {

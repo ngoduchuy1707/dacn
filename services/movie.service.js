@@ -9,7 +9,7 @@ const { Session } = require("../models/session.model");
 module.exports.getMovie = async (req, res, next) => {
   try {
     const [movie, count] = await Promise.all([
-      Movie.find(),
+      Movie.find().populate('category_id'),
       Movie.countDocuments(),
     ]);
     if (!movie) {

@@ -5,12 +5,19 @@ const passport = require("passport");
 const { authorizing } = require("../middlewares/auth/index");
 const sessionService = require("../services/session.service");
 
+
+
 //GET SESSION BY ID
 router.get(
     "/sessions/:sessionId",
     sessionService.getSessionById
 );
 
+//GET SESSION BY MOVIE ID
+router.get(
+    "/sessions/movie/:movieId",
+    sessionService.getSessionByMovieId
+)
 //GET SESSION
 router.get(
     "/sessions",

@@ -1,7 +1,9 @@
 const errorResult = require("../config/errors/errorResult");
+
 const { Seat } = require("../models/seat.model");
 const { Theaters } = require("../models/theaters.model");
 const { Cinema } = require("../models/cinema.model");
+const { filter } = require("lodash");
 
 const seatCodeArray = [
   "A01",
@@ -45,7 +47,7 @@ const seatCodeArray = [
 module.exports.getTheaters = async (req, res, next) => {
   try {
     const [theaters, count] = await Promise.all([
-      Theaters.find(),
+      Theaters.find().populate('cinema_id'),
       Theaters.countDocuments()
     ]);
     const [cinemas] = await Promise.all([
@@ -56,33 +58,12 @@ module.exports.getTheaters = async (req, res, next) => {
         error: errorResult.badRequest,
       };
     }
-    else {
-      let cinemaRecords = [];
-      let cinemaRecord = {};
-      let data = [];
-      console.log("theaters: ",typeof theaters);
-      theaters.map((theater, index) => {
-        cinemaRecord = cinemas.find((cinema) => {
-          return (cinema._id).toString() === (theater.cinema_id).toString()
-        })
-        cinemaRecords.push(cinemaRecord)
-        if (cinemaRecords.length === theaters.length) {
-          
-          theaters.map((theater, index) => {
-            theater = {
-              ...theater._doc,
-              cinema_Name: cinemaRecords[index].cinema_Name
-            }
-            data.push(theater)
-          })
-        }
-      })
+    else {    
       return res.json({
         message: errorResult.success,
-        data: data,
+        data: theaters,
         total_page: count,
       });
-
     }
   } catch (error) {
     return res.json(error);
