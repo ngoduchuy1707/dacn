@@ -24,10 +24,6 @@ const ticketSchema = new mongoose.Schema({
     food_Name: {
         type: String
     },
-    tixId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Tix"
-    },
     time: {
         type: String
     },

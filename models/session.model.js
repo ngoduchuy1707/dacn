@@ -20,9 +20,13 @@ const sessionSchema = new mongoose.Schema({
     ref: "Movie",
   },
   time: {
-    type: Date,
+    type: String,
     required: true,
   },
+  date: {
+    type: Date,
+    required: true
+  }
 });
 
 const Session = mongoose.model("Session", sessionSchema, "Session");

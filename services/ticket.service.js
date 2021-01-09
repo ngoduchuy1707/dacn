@@ -79,43 +79,45 @@ module.exports.bookTicket = async (req, res, next) => {
       cinemaId,
       date,
       theatersId,
-      price,
       foodId,
       seatCodes,
       tixQuantity,
       foodQuantity,
     } = req.body;
-    const session = await Session.find({
+    const session = await Session.findOne({
       //tim suat chieu
       movie_id: movieId,
       theaters_id: theatersId,
       cinema_id: cinemaId,
-      date: date,
+      time: date,
     });
-    //khong tim thay suat chieu hoac khong tim thay loai ghe
+    //khong tim thay suat chieu
     if (
       !session ||
-      (session && (session.length < 1 || session.price !== price))
+      (session && session.length < 1)
     ) {
       throw {
-        error: errorResult.notFound,
+        error: "session not found",
       };
     }
-    const theaters = await Theaters.findById(session.theaters_id);
-    const availableSeatCodes = theaters.seats
+    const theaters = await Theaters.findOne({ _id: session.theaters_id });
+    let availableSeatCodes =[];
+    availableSeatCodes = theaters.seats
       .filter((seat) => seat.isBooked === 0)
       .map((seat) => seat.code);
+      //mot mang co gia tri isBooked=0
     const errSeatCodes = [];
+    
     seatCodes.forEach((code) => {
-      if (availableSeatCodes.indexOf(code) === -1) {
+      if (seatCodes.indexOf(code) === -1) {
         errSeatCodes.push(code);
       }
     });
     if (errSeatCodes.length > 0) {
-      return Promise.reject({
+      throw {
         status: 404,
         error: `Seat ${errSeatCodes.join(", ")} is/are not available`,
-      });
+      }
     }
     seatCodes.forEach((code) => {
       const index = theaters.seats.findIndex((seat) => seat.code === code);

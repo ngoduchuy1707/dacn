@@ -53,7 +53,7 @@ module.exports.getSessionByMovieId = async (req, res, next) => {
   try {
     const { movieId } = req.params;
     const [session, count] = await Promise.all([
-      Session.find({ movie_id: movieId }).populate('cinema_id'),
+      Session.find({ movie_id: movieId }).populate('cinema_id movie_id'),
       Session.countDocuments()
     ])
     if (!session) {
@@ -75,7 +75,7 @@ module.exports.getSessionByMovieId = async (req, res, next) => {
 //CREATE SESSION
 module.exports.createSession = async (req, res, next) => {
   try {
-    const { movie_id, cinema_id, theaters_id, price, time } = req.body;
+    const { movie_id, cinema_id, theaters_id, price, time, date } = req.body;
     const movie = await Movie.findById(movie_id);
     const cinema = await Cinema.findById(cinema_id);
     const theaters = await Theaters.findById(theaters_id);
@@ -100,6 +100,7 @@ module.exports.createSession = async (req, res, next) => {
         theaters_id,
         price,
         time,
+        date
       });
       return res.json({
         message: errorResult.success,
@@ -115,7 +116,7 @@ module.exports.createSession = async (req, res, next) => {
 module.exports.updateSession = async (req, res, next) => {
   try {
     const { sessionId } = req.params;
-    const { movie_id, cinema_id, theaters_id, price, time } = req.body;
+    const { movie_id, cinema_id, theaters_id, price, time, date } = req.body;
     const movie = await Movie.findById(movie_id);
     const cinema = await Cinema.findById(cinema_id);
     const theaters = await Theaters.findById(theaters_id);
@@ -141,6 +142,7 @@ module.exports.updateSession = async (req, res, next) => {
           : session.theaters_id;
         session.time = req.body.time ? req.body.time : session.time;
         session.price = req.body.price ? req.body.price : session.price;
+        session.date = req.body.time ? req.body.date : session.date;
       }
       session.save();
       return res.json({
