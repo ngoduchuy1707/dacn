@@ -51,12 +51,13 @@ module.exports.getFoodById = async (req, res, next) => {
 //CREATE FOOD
 module.exports.createFood = async (req, res, next) => {
   try {
-    const { food_Name, price, quantity, desc } = req.body;
+    const { food_Name, price, quantity, desc ,food_Image} = req.body;
     const food = await Food.create({
       food_Name,
       price,
       quantity,
       desc,
+      food_Image
     });
     return res.json({
       message: errorResult.success,
@@ -71,10 +72,10 @@ module.exports.createFood = async (req, res, next) => {
 module.exports.updateFood = async (req, res, next) => {
   try {
     const { foodId } = req.params;
-    const { food_Name, price, quantity, desc } = req.body;
+    const { food_Name, price, quantity, desc,food_Image } = req.body;
     const food = await Food.findByIdAndUpdate(
       { _id: foodId },
-      { food_Name, price, quantity, desc },
+      { food_Name, price, quantity, desc,food_Image },
       { new: true }
     );
     if (!food) {

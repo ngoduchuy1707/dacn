@@ -5,7 +5,7 @@ const errResult = require("../../../config/errors/errorResult");
 const { Food } = require("../../../models/food.model");
 
 module.exports.validateCreateFood = async (req, res, next) => {
-  const { food_Name, food_Price, quantity, desc } = req.body;
+  const { food_Name, food_Price, quantity, desc,food_Image } = req.body;
 
   const authSchema = Joi.object({
     food_Name: Joi.string().label("FoodName").required(),
