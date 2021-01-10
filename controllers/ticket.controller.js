@@ -13,6 +13,11 @@ router.get(
     ticketService.getTicketId
 );
 
+//UPDATE STATUS
+router.put(
+    "/tickets/:ticketId",
+    ticketService.updateStatus
+)
 //GET TICKET
 router.get(
     "/tickets",

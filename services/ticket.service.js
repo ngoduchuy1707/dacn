@@ -13,7 +13,7 @@ const { Food } = require("../models/food.model");
 module.exports.getTicket = async (req, res, next) => {
   try {
     const [ticket, count] = await Promise.all([
-      Ticket.find().populate({path:'user_id foodId',select:'email fullName food_Name'}),
+      Ticket.find().populate({ path: 'user_id foodId', select: 'email fullName food_Name' }),
       Ticket.countDocuments(),
     ])
 
@@ -37,7 +37,7 @@ module.exports.getTicket = async (req, res, next) => {
 module.exports.getTicketId = async (req, res, next) => {
   try {
     const { ticketId } = req.params;
-    const ticket = await Ticket.findById(ticketId).populate({path:'user_id foodId',select:'email fullName food_Name'});
+    const ticket = await Ticket.findById(ticketId).populate({ path: 'user_id foodId', select: 'email fullName food_Name' });
     if (!ticket) {
       throw {
         error: errorResult.notFound,
@@ -102,8 +102,8 @@ module.exports.bookTicket = async (req, res, next) => {
       theaters.seats[index].isBooked = 1;
     });
     theaters.save();
-    
-    
+
+
     const result = await Ticket.create({
       user_id: userId,
       session,
@@ -120,3 +120,25 @@ module.exports.bookTicket = async (req, res, next) => {
     return res.json(error);
   }
 };
+
+// UPDATE STATUS
+module.exports.updateStatus = async (req, res, next) => {
+  try {
+    const { ticketId } = req.params;
+    const ticket = await Ticket.findById(ticketId);
+    if (!ticket) {
+      throw {
+        error: errorResult.notFound
+      }
+    } else {
+      ticket.status = 'success';
+      ticket.save();
+      return res.json({
+        message: errorResult.success,
+        data: ticket
+      })
+    }
+  } catch (error) {
+    return res.json(error)
+  }
+}
