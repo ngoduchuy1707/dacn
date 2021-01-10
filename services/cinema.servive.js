@@ -114,17 +114,17 @@ module.exports.deleteCinema = async (req, res, next) => {
 //SEARCH MOVIE
 module.exports.searchMovie = async (req, res, next) => {
   try {
-    const movieName = handleString.cleanAccents(req.query.name);
+    //const name = handleString.cleanAccents(req.query.name);
     const regex = new RegExp(req.query.name, "i");
-    const cinema = await Movie.find({ name: regex });
-    if (cinema.length <= 0) {
+    const movie = await Movie.find({ name: regex });
+    if (!movie) {
       throw {
-        message: errorResult.notFound,
+        error: errorResult.notFound,
       };
     } else {
       return res.json({
         message: errorResult.success,
-        data: cinema,
+        data: movie,
       });
     }
   } catch (error) {

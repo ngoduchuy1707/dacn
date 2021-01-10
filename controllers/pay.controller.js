@@ -3,7 +3,7 @@ const router = express.Router();
 const payService = require("../services/pay.service");
 
 router.post(
-    "/create-payment/:ticketId",
+    "/create-payment",
     payService.createPayment
 );
 

@@ -9,10 +9,10 @@ const cinemaSchema = new mongoose.Schema({
         type: String
     },
     lat: {
-        type: String
+        type: Number
     },
     lng: {
-        type: String
+        type: Number
     }
 });
 

@@ -5,6 +5,12 @@ const passport = require("passport");
 const { authorizing } = require("../middlewares/auth/index");
 const cinemaService = require("../services/cinema.servive");
 
+//SEARCH MOVIE
+router.get(
+  "/cinemas/search-movie",
+  cinemaService.searchMovie
+);
+
 //GET CINEMA
 router.get(
   "/cinemas",
@@ -41,10 +47,5 @@ router.delete(
   cinemaService.deleteCinema
 );
 
-//SEARCH MOVIE
-router.post(
-  "/cinemas/search-movie",
-  cinemaService.searchMovie
-);
 
 module.exports = router;

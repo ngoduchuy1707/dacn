@@ -102,7 +102,7 @@ module.exports.createPayment = async (req, res, next) => {
       return sorted;
     }
   } catch (error) {
-    next(error);
+    return res.json(error)
   }
 };
 

@@ -13,7 +13,7 @@ const { Food } = require("../models/food.model");
 module.exports.getTicket = async (req, res, next) => {
   try {
     const [ticket, count] = await Promise.all([
-      Ticket.find().populate({path:'user_id',select:'email fullName'}),
+      Ticket.find().populate({path:'user_id foodId',select:'email fullName food_Name'}),
       Ticket.countDocuments(),
     ])
 
@@ -37,7 +37,7 @@ module.exports.getTicket = async (req, res, next) => {
 module.exports.getTicketId = async (req, res, next) => {
   try {
     const { ticketId } = req.params;
-    const ticket = await Ticket.findById(ticketId).populate({path:'user_id',select:'email fullName'});
+    const ticket = await Ticket.findById(ticketId).populate({path:'user_id foodId',select:'email fullName food_Name'});
     if (!ticket) {
       throw {
         error: errorResult.notFound,
@@ -84,11 +84,10 @@ module.exports.bookTicket = async (req, res, next) => {
       sessionId,
       foodId,
       seatCodes,
-      foodQuantity,
+      quantityFood,
       totalPrice
     } = req.body;
     const session = await Session.findOne({ _id: sessionId }).populate('cinema_id movie_id theaters_id');
-    console.log("session", session);
     //khong tim thay suat chieu
     if (
       !session ||
@@ -99,49 +98,18 @@ module.exports.bookTicket = async (req, res, next) => {
       };
     }
     const theaters = await Theaters.findOne({ _id: session.theaters_id });
-    // let availableSeatCodes = [];
-    // availableSeatCodes = theaters.seats
-    //   .filter((seat) => seat.isBooked === 0)
-    //   .map((seat) => seat.code);
-    //   console.log("availableSeatCodes ",availableSeatCodes);
-    // //mot mang co gia tri isBooked=0 (chua dat)
-    // const errSeatCodes = [];
-
-    // seatCodes.forEach((code) => {
-    //   if (availableSeatCodes.indexOf(code) === -1) {
-    //     errSeatCodes.push(code);
-    //   }
-    // });
-    // if (errSeatCodes.length > 0) {
-    //   throw {
-    //     status: 404,
-    //     error: `Seat ${errSeatCodes.join(", ")} is/are not available`,
-    //   }
-    // }
     seatCodes.forEach((code) => {
       const index = theaters.seats.findIndex((seat) => seat.code === code);
       theaters.seats[index].isBooked = 1;
     });
     theaters.save();
-    if (foodId === "" || foodId === null || foodId === undefined) {
-      food_Name = "";
-      //totalPrice = session.price * tixQuantity;
-    } else {
-      const food = await Food.findById(foodId);
-      if (!food || food.quantity < foodQuantity) {
-        throw {
-          error: errorResult.badRequest,
-        };
-      } else {
-        food_Name = food.food_Name;
-        food.quantity = food.quantity - foodQuantity;
-      }
-      food.save();
-    }
+    
+    
     const result = await Ticket.create({
       user_id: userId,
       session,
-      food_Name,
+      foodId,
+      quantityFood,
       totalPrice,
       seats: seatCodes
     })

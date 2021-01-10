@@ -135,7 +135,7 @@ module.exports.updateSession = async (req, res, next) => {
     } else {
       if (!movie || !cinema || !theaters) {
         throw {
-          error: errorResult.notFound,
+          error: errorResult.badRequest,
         };
       } else {
         session.movie_id = req.body.movie_id

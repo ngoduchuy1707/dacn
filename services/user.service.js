@@ -322,7 +322,6 @@ module.exports.getUserByName = async (req, res, next) => {
   try {
     const name = req.query.fullName;
     const regex = new RegExp(name, "i");
-    //const user = await User.find({ fullName: regex }).select("email fullName userType _id avatarUrl phone address dateOfBirth")
     const user = await User.find({ fullName: regex });
     if (name === "" || user.length < 1 || name === null) {
       throw {

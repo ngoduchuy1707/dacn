@@ -13,9 +13,13 @@ const ticketSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Session"
     },
-    food_Name: {
+    foodId: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Food"
+    }],
+    quantityFood: [{
         type: String
-    },
+    }],
     status: {
         type: String,
         default: "waiting"
@@ -23,6 +27,7 @@ const ticketSchema = new mongoose.Schema({
     seats: [{
         type: String
     }],
+
     totalPrice: {
         type: Number
     },
