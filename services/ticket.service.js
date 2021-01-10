@@ -79,7 +79,6 @@ module.exports.deleteTicket = async (req, res, next) => {
 module.exports.bookTicket = async (req, res, next) => {
   try {
     const userId = req.user._id;
-
     const {
       sessionId,
       foodId,

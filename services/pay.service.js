@@ -108,24 +108,9 @@ module.exports.createPayment = async (req, res, next) => {
 
 module.exports.getPayment = async (req, res, next) => {
   try {
-    // const { ticketId, theatersId } = req.params;
-    // const ticket = await Ticket.findById(ticketId);
-    // const theaters = await Theaters.findById(theatersId);
-    // if (!ticket || !theaters) {
-    //     throw {
-    //         error: errorResult.notFound
-    //     }
-    // }
-    // const session = mongoose.startSession();
-
-    // const transactionOptions = {
-    //     readPreference: "primary",
-    //     readConcern: { level: "local" },
-    //     writeConcern: { w: "majority" }
-    // };
 
     let vnp_Params = req.query;
-
+console.log("vnp_Params",vnp_Params);
     var secureHash = vnp_Params["vnp_SecureHash"];
 
     delete vnp_Params["vnp_SecureHash"];
