@@ -54,7 +54,7 @@ module.exports.createPayment = async (req, res, next) => {
     let locale = "vn";
     const currCode = "VND";
     let vnp_Params = {};
-
+    vnp_Params = {};
     vnp_Params["vnp_Version"] = "2";
     vnp_Params["vnp_Command"] = "pay";
     vnp_Params["vnp_TmnCode"] = tmnCode;
@@ -69,9 +69,8 @@ module.exports.createPayment = async (req, res, next) => {
     vnp_Params["vnp_IpAddr"] = ipAddr;
     vnp_Params["vnp_CreateDate"] = createDate;
     vnp_Params["vnp_BankCode"] = bankCode;
-
+    //console.log('vnpParams',vnp_Params)
     vnp_Params = sortObject(vnp_Params);
-
     var signData =
       secretKey + querystring.stringify(vnp_Params, { encode: false });
 
@@ -79,10 +78,8 @@ module.exports.createPayment = async (req, res, next) => {
 
     vnp_Params["vnp_SecureHashType"] = "SHA256";
     vnp_Params["vnp_SecureHash"] = secureHash;
-    vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: true });
-
-    res.status(200).json({ code: "00", data: vnpUrl });
-
+    vnpUrl = '';
+    vnpUrl = 'http://sandbox.vnpayment.vn/paymentv2/vpcpay.html?' + querystring.stringify(vnp_Params, { encode: true })
     function sortObject(o) {
       var sorted = {},
         key,
@@ -101,6 +98,9 @@ module.exports.createPayment = async (req, res, next) => {
       }
       return sorted;
     }
+   return res.status(200).json({ code: "00", data: vnpUrl });
+
+    
   } catch (error) {
     return res.json(error)
   }
