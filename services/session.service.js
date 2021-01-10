@@ -59,7 +59,7 @@ module.exports.getSessionByMovieId = async (req, res, next) => {
     const [session, count] = await Promise.all([
       Session
         .find({ movie_id: movieId })
-        .populate({ path: 'cinema_id movie_id theaters_id', select: 'cinema_Name address name theaters_Name' }),
+        .populate({ path: 'cinema_id movie_id theaters_id', select: 'cinema_Name lat lng address name theaters_Name' }),
       Session.countDocuments()
     ])
     if (!session) {
