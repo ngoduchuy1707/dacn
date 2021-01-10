@@ -11,7 +11,7 @@ module.exports.getSession = async (req, res, next) => {
     const [sessions, count] = await Promise.all([
       Session
         .find()
-        .populate({ path: 'movie_id cinema_id theaters_id', select: 'name cinema_Name address theaters_Name' }),
+        .populate({ path: 'movie_id cinema_id theaters_id', select: 'name smallImage cinema_Name address theaters_Name seats' }),
       Session.countDocuments(),
     ]);
     if (!sessions) {
@@ -36,7 +36,7 @@ module.exports.getSessionById = async (req, res, next) => {
     const { sessionId } = req.params;
     const session = await Session
       .findById(sessionId)
-      .populate({ path: 'movie_id cinema_id theaters_id', select: 'name cinema_Name address theaters_Name' });
+      .populate({ path: 'movie_id cinema_id theaters_id', select: 'name smallImage cinema_Name address theaters_Name seats' });
     if (!session) {
       throw {
         error: errorResult.notFound,
@@ -59,7 +59,7 @@ module.exports.getSessionByMovieId = async (req, res, next) => {
     const [session, count] = await Promise.all([
       Session
         .find({ movie_id: movieId })
-        .populate({ path: 'cinema_id movie_id theaters_id', select: 'cinema_Name lat lng address name theaters_Name' }),
+        .populate({ path: 'cinema_id movie_id theaters_id', select: 'cinema_Name lat lng address name smallImage theaters_Name seats' }),
       Session.countDocuments()
     ])
     if (!session) {
