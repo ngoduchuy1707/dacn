@@ -54,13 +54,6 @@ module.exports.createPayment = async (req, res, next) => {
     let locale = "vn";
     const currCode = "VND";
     let vnp_Params = {};
-    // const { ticketId } = req.params;
-    // const ticket = await Ticket.findById(ticketId);
-    // if (!ticket) {
-    //     throw {
-    //         error: errorResult.notFound
-    //     }
-    // }
 
     vnp_Params["vnp_Version"] = "2";
     vnp_Params["vnp_Command"] = "pay";

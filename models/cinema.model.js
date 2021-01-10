@@ -7,6 +7,12 @@ const cinemaSchema = new mongoose.Schema({
     },
     address: {
         type: String
+    },
+    lat: {
+        type: String
+    },
+    lng: {
+        type: String
     }
 });
 

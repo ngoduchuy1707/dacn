@@ -47,10 +47,12 @@ module.exports.getCinemaById = async (req, res, next) => {
 //CREATE CINEMA
 module.exports.createCinema = async (req, res, next) => {
   try {
-    const { cinema_Name, address } = req.body;
+    const { cinema_Name, address, lat, lng } = req.body;
     const cinema = await Cinema.create({
       cinema_Name,
       address,
+      lat,
+      lng
     });
     return res.json({
       message: errorResult.success,
@@ -65,10 +67,10 @@ module.exports.createCinema = async (req, res, next) => {
 module.exports.updateCinema = async (req, res, next) => {
   try {
     const { cinemaId } = req.params;
-    const { cinema_Name, address } = req.body;
+    const { cinema_Name, address, lat, lng } = req.body;
     const cinema = await Cinema.findByIdAndUpdate(
       { _id: cinemaId },
-      { cinema_Name, address },
+      { cinema_Name, address, lat, lng },
       { new: true }
     );
     if (!cinema) {
