@@ -9,26 +9,12 @@ const ticketSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     },
-    cinemaId: {
+    sessionId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Cinema"
-    },
-    movieId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Movie"
-    },
-    theatersId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Theaters"
+        ref: "Session"
     },
     food_Name: {
         type: String
-    },
-    time: {
-        type: String
-    },
-    date: {
-        type: Date
     },
     status: {
         type: String,

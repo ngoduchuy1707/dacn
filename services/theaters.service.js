@@ -47,18 +47,15 @@ const seatCodeArray = [
 module.exports.getTheaters = async (req, res, next) => {
   try {
     const [theaters, count] = await Promise.all([
-      Theaters.find().populate('cinema_id'),
+      Theaters.find().populate({ path: 'cinema_id', select: 'cinema_Name' }),
       Theaters.countDocuments()
-    ]);
-    const [cinemas] = await Promise.all([
-      Cinema.find(),
     ]);
     if (!theaters) {
       throw {
         error: errorResult.badRequest,
       };
     }
-    else {    
+    else {
       return res.json({
         message: errorResult.success,
         data: theaters,
@@ -75,19 +72,15 @@ module.exports.getTheatersById = async (req, res, next) => {
   try {
     const { theatersId } = req.params;
     let cinemaName;
-    const theaters = await Theaters.findById(theatersId);
+    const theaters = await Theaters.findById(theatersId).populate({ path: 'cinema_id', select: 'cinema_Name' });
     if (!theaters) {
       throw {
         error: errorResult.notFound,
       };
     } else {
-      const cinema = await Cinema.find({ _id: theaters.cinema_id });
-      cinema.forEach((key) => {
-        cinemaName = key.cinema_Name;
-      });
       return res.json({
         message: errorResult.success,
-        data: { theaters, cinemaName: cinemaName },
+        data: theaters
       });
     }
   } catch (error) {
@@ -99,7 +92,7 @@ module.exports.getTheatersById = async (req, res, next) => {
 module.exports.getTheatersByCinema = async (req, res, next) => {
   try {
     const { cinema } = req.query;
-    const theaters = await Theaters.find({ cinema_id: cinema });
+    const theaters = await Theaters.find({ cinema_id: cinema }).populate({ path: 'cinema_id', select: 'cinema_Name' });
     if (!theaters || theaters.length < 1) {
       throw {
         error: errorResult.notFound,

@@ -12,8 +12,8 @@ const sessionSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Theaters",
   },
-  price: {
-    type: String,
+  totalPrice: {
+    type: Number,
   },
   movie_id: {
     type: mongoose.Schema.Types.ObjectId,

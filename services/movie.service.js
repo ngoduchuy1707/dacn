@@ -9,7 +9,9 @@ const { Session } = require("../models/session.model");
 module.exports.getMovie = async (req, res, next) => {
   try {
     const [movie, count] = await Promise.all([
-      Movie.find().populate('category_id'),
+      Movie
+        .find()
+        .populate({ path: 'category_id', select: 'category_Name' }),
       Movie.countDocuments(),
     ]);
     if (!movie) {
@@ -35,7 +37,7 @@ module.exports.getMovie = async (req, res, next) => {
 module.exports.getMovieById = async (req, res, next) => {
   try {
     const { movieId } = req.params;
-    const movie = await Movie.findById(movieId);
+    const movie = await Movie.findById(movieId).populate({ path: 'category_id', select: 'category_Name' });
     if (!movie) {
       throw {
         error: errorResult.notFound,
@@ -56,7 +58,7 @@ module.exports.getByStatus = async (req, res, next) => {
   try {
     const status = new RegExp(req.query.status, "i");
     const [movie, count] = await Promise.all([
-      Movie.find({ status: status }),
+      Movie.find({ status: status }).populate({ path: 'category_id', select: 'category_Name' }),
       Movie.count({ status: status }),
     ]);
     if (!movie || (movie && movie.length < 1)) {
@@ -321,7 +323,7 @@ module.exports.getMovieByCategory = async (req, res, next) => {
   try {
     const { categoryId } = req.query;
     const [movie, count] = await Promise.all([
-      Movie.find({ category_id: categoryId }),
+      Movie.find({ category_id: categoryId }).populate({ path: 'category_id', select: 'category_Name' }),
       Movie.count(),
     ]);
     if (!movie) {
@@ -343,17 +345,3 @@ module.exports.getMovieByCategory = async (req, res, next) => {
   }
 };
 
-// module.exports.getTime = async (req, res, next) => {
-//   try {
-//     const { movieId, time } = req.query;
-//     const session = await Session.find({ movie_id: movieId, time: time });
-//     if (!session) {
-//       throw {
-//         error: errorResult.notFound,
-//       };
-//     } else {
-//     }
-//   } catch (error) {
-//     next(error);
-//   }
-// };

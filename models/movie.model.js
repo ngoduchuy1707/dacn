@@ -40,6 +40,7 @@ const movieSchema = new mongoose.Schema({
   category_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
+    required: true
   },
   maturity: {
     type: String,

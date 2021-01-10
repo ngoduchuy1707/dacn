@@ -8,12 +8,15 @@ const { Session } = require("../models/session.model");
 const { Movie } = require("../models/movie.model");
 const { Cinema } = require("../models/cinema.model");
 const { Food } = require("../models/food.model");
-//const { Tix } = require("../models/tix.model");
 
 //GET TICKET
 module.exports.getTicket = async (req, res, next) => {
   try {
-    const ticket = await Ticket.find();
+    const [ticket, count] = await Promise.all([
+      Ticket.find().populate({path:'user_id',select:'email fullName'}),
+      Ticket.countDocuments(),
+    ])
+
     if (!ticket) {
       throw {
         error: "Ticket Empty",
@@ -22,6 +25,7 @@ module.exports.getTicket = async (req, res, next) => {
       return res.json({
         message: errorResult.success,
         data: ticket,
+        total_page: count
       });
     }
   } catch (error) {
@@ -33,7 +37,7 @@ module.exports.getTicket = async (req, res, next) => {
 module.exports.getTicketId = async (req, res, next) => {
   try {
     const { ticketId } = req.params;
-    const ticket = await Ticket.findById(ticketId);
+    const ticket = await Ticket.findById(ticketId).populate({path:'user_id',select:'email fullName'});
     if (!ticket) {
       throw {
         error: errorResult.notFound,
@@ -42,6 +46,7 @@ module.exports.getTicketId = async (req, res, next) => {
       return res.json({
         message: errorResult.success,
         data: ticket,
+        total_page: count
       });
     }
   } catch (error) {
@@ -70,27 +75,20 @@ module.exports.deleteTicket = async (req, res, next) => {
   }
 };
 
-//BOOK TICKET
+//CREATE BOOK TICKET
 module.exports.bookTicket = async (req, res, next) => {
   try {
     const userId = req.user._id;
+
     const {
-      movieId,
-      cinemaId,
-      date,
-      theatersId,
+      sessionId,
       foodId,
       seatCodes,
-      tixQuantity,
       foodQuantity,
+      totalPrice
     } = req.body;
-    const session = await Session.findOne({
-      //tim suat chieu
-      movie_id: movieId,
-      theaters_id: theatersId,
-      cinema_id: cinemaId,
-      time: date,
-    });
+    const session = await Session.findOne({ _id: sessionId }).populate('cinema_id movie_id theaters_id');
+    console.log("session", session);
     //khong tim thay suat chieu
     if (
       !session ||
@@ -101,32 +99,33 @@ module.exports.bookTicket = async (req, res, next) => {
       };
     }
     const theaters = await Theaters.findOne({ _id: session.theaters_id });
-    let availableSeatCodes =[];
-    availableSeatCodes = theaters.seats
-      .filter((seat) => seat.isBooked === 0)
-      .map((seat) => seat.code);
-      //mot mang co gia tri isBooked=0
-    const errSeatCodes = [];
-    
-    seatCodes.forEach((code) => {
-      if (seatCodes.indexOf(code) === -1) {
-        errSeatCodes.push(code);
-      }
-    });
-    if (errSeatCodes.length > 0) {
-      throw {
-        status: 404,
-        error: `Seat ${errSeatCodes.join(", ")} is/are not available`,
-      }
-    }
+    // let availableSeatCodes = [];
+    // availableSeatCodes = theaters.seats
+    //   .filter((seat) => seat.isBooked === 0)
+    //   .map((seat) => seat.code);
+    //   console.log("availableSeatCodes ",availableSeatCodes);
+    // //mot mang co gia tri isBooked=0 (chua dat)
+    // const errSeatCodes = [];
+
+    // seatCodes.forEach((code) => {
+    //   if (availableSeatCodes.indexOf(code) === -1) {
+    //     errSeatCodes.push(code);
+    //   }
+    // });
+    // if (errSeatCodes.length > 0) {
+    //   throw {
+    //     status: 404,
+    //     error: `Seat ${errSeatCodes.join(", ")} is/are not available`,
+    //   }
+    // }
     seatCodes.forEach((code) => {
       const index = theaters.seats.findIndex((seat) => seat.code === code);
       theaters.seats[index].isBooked = 1;
     });
     theaters.save();
-    if (foodId === "" || foodId === null) {
+    if (foodId === "" || foodId === null || foodId === undefined) {
       food_Name = "";
-      totalPrice = session.price * tixQuantity;
+      //totalPrice = session.price * tixQuantity;
     } else {
       const food = await Food.findById(foodId);
       if (!food || food.quantity < foodQuantity) {
@@ -135,24 +134,17 @@ module.exports.bookTicket = async (req, res, next) => {
         };
       } else {
         food_Name = food.food_Name;
-        totalPrice =
-          session.price * tixQuantity + food.food_Price * foodQuantity;
         food.quantity = food.quantity - foodQuantity;
-        food.save();
       }
+      food.save();
     }
-    const result = await Promise.all([
-      Ticket.create({
-        userId,
-        movieId,
-        cinemaId,
-        food_Name,
-        date,
-        totalPrice,
-        seats: seat.code,
-      }),
-      theaters.save(),
-    ]);
+    const result = await Ticket.create({
+      user_id: userId,
+      session,
+      food_Name,
+      totalPrice,
+      seats: seatCodes
+    })
     return res.json({
       message: errorResult.success,
       data: result,
