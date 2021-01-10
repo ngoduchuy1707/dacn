@@ -12,7 +12,7 @@ const sessionSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Theaters",
   },
-  totalPrice: {
+  price: {
     type: Number,
   },
   movie_id: {

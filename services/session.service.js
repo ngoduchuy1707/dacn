@@ -81,13 +81,14 @@ module.exports.getSessionByMovieId = async (req, res, next) => {
 //CREATE SESSION
 module.exports.createSession = async (req, res, next) => {
   try {
-    const { movie_id, cinema_id, theaters_id, totalPrice, time, date } = req.body;
+    const { movie_id, cinema_id, theaters_id, price, time, date } = req.body;
     const movie = await Movie.findById(movie_id);
     const cinema = await Cinema.findById(cinema_id);
     const theaters = await Theaters.findById(theaters_id);
     const result = await Session.find({
       movie_id: movie_id,
       time: time,
+      date: date,
       cinema_id: cinema_id,
     });
     if (result && result.length > 0) {
@@ -104,7 +105,7 @@ module.exports.createSession = async (req, res, next) => {
         movie_id,
         cinema_id,
         theaters_id,
-        totalPrice,
+        price,
         time,
         date
       });
@@ -147,7 +148,7 @@ module.exports.updateSession = async (req, res, next) => {
           ? req.body.theaters_id
           : session.theaters_id;
         session.time = req.body.time ? req.body.time : session.time;
-        session.totalPrice = req.body.price ? req.body.price : session.totalPrice;
+        session.price = req.body.price ? req.body.price : session.price;
         session.date = req.body.time ? req.body.date : session.date;
       }
       session.save();
