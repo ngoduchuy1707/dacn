@@ -5,6 +5,14 @@ const router = express.Router();
 const { authorizing } = require("../middlewares/auth/index");
 const ticketService = require("../services/ticket.service");
 
+//GET TICKET BY USER ID
+router.get(
+    "/tickets/users",
+    passport.authenticate("jwt", { session: false }),
+    authorizing(["member"]),
+    ticketService.getTicketUserId
+)
+
 //GET TICKET BY ID
 router.get(
     "/tickets/:ticketId",

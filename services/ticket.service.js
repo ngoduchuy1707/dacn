@@ -54,6 +54,31 @@ module.exports.getTicketId = async (req, res, next) => {
   }
 };
 
+//GET TICKET BY USER ID
+module.exports.getTicketUserId = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const [ticket, count] = await Promise.all([
+      Ticket.find({ user_id: userId }).populate({ path: 'user_id', select: 'email fullName' }),
+      Ticket.countDocuments()
+    ])
+
+    if (!ticket) {
+      throw {
+        error: errorResult.notFound,
+      };
+    } else {
+      return res.json({
+        message: errorResult.success,
+        data: ticket,
+        total_record: count
+      });
+    }
+  } catch (error) {
+    return res.json(error);
+  }
+};
+
 //DELETE TICKET
 module.exports.deleteTicket = async (req, res, next) => {
   try {
