@@ -5,33 +5,26 @@ const { Theaters } = require("./theaters.model");
 const { Ticket } = require("./ticket.model");
 
 const billSchema = new mongoose.Schema({
-    cinema_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Cinema"
+    amount: {
+        type: Number
     },
-    user_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+    bankCode: {
+        type: String
     },
-    movie_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Movie"
-    },
-    theaters_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Theaters"
+    transactionsId: {
+        type: String
     },
     ticket_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Ticket"
     },
     timeCreate: {
-        type:String,
+        type: String,
         default: Date.now()
     },
     status: {
         type: String,
-        default: "waiting"
+        default: "Success"
     }
 });
 

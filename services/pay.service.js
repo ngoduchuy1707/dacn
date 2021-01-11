@@ -12,6 +12,7 @@ const { Payment } = require("../models/pay.model");
 const { Theaters } = require("../models/theaters.model");
 const { mongo } = require("mongoose");
 const { session } = require("passport");
+const { Bill } = require("../models/bill.model");
 
 const tmnCode = configKey.CLIENT_ID;
 const secretKey = configKey.CLIENT_SECRET;
@@ -98,9 +99,9 @@ module.exports.createPayment = async (req, res, next) => {
       }
       return sorted;
     }
-   return res.status(200).json({ code: "00", data: vnpUrl });
+    return res.status(200).json({ code: "00", data: vnpUrl });
 
-    
+
   } catch (error) {
     return res.json(error)
   }
@@ -110,7 +111,6 @@ module.exports.getPayment = async (req, res, next) => {
   try {
 
     let vnp_Params = req.query;
-console.log("vnp_Params",vnp_Params);
     var secureHash = vnp_Params["vnp_SecureHash"];
 
     delete vnp_Params["vnp_SecureHash"];
@@ -120,21 +120,6 @@ console.log("vnp_Params",vnp_Params);
     var signData =
       secretKey + querystring.stringify(vnp_Params, { encode: false });
     var checkSum = sha256(signData);
-
-    if (secureHash === checkSum) {
-      var orderId = vnp_Params["vnp_TxnRef"];
-      var rspCode = vnp_Params["vnp_ResponseCode"];
-      res.status(200).json({
-        RspCode: "00",
-        Message: "success",
-      });
-      //ticket.status = "paymented";
-    } else {
-      res.status(200).json({
-        RspCode: "97",
-        Message: "Fail checksum",
-      });
-    }
     function sortObject(o) {
       let sorted = {},
         key,
@@ -153,6 +138,32 @@ console.log("vnp_Params",vnp_Params);
       }
       return sorted;
     }
+    if (secureHash === checkSum) {
+      var orderId = vnp_Params["vnp_TxnRef"];
+      var rspCode = vnp_Params["vnp_ResponseCode"];
+      const [bill, ticket] = await Promise.all([
+        Bill.create({
+          amount: vnp_Params.vnp_Amount,
+          transactionsId: vnp_Params.vnp_TxnRef,
+          bankCode: vnp_Params.vnp_BankCode,
+          ticket_id: vnp_Params.vnp_OrderInfo
+        }),
+        Ticket.findOneAndUpdate({ _id: vnp_Params.vnp_OrderInfo }, { status: 'success' }, { new: true }),
+      ])
+      return res.status(200).json({
+        RspCode: "00",
+        Message: "success",
+        data: bill,
+        ticket: ticket
+      });
+
+    } else {
+      return res.status(200).json({
+        RspCode: "97",
+        Message: "Fail checksum",
+      });
+    }
+
   } catch (error) {
     next(error);
   }

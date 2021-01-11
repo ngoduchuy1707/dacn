@@ -9,13 +9,18 @@ const { Bill } = require("../models/bill.model");
 //GET BILL
 module.exports.getBill = async (req, res, next) => {
   try {
-    const bill = await Bill.find();
+    const [bill, count] = await Promise.all([
+      Bill.find().populate({ path: 'ticket_id' }),
+      Bill.countDocuments()
+    ])
+
     if (!bill) {
       throw { error: errorResult.badRequest };
     } else {
       return res.json({
         message: errorResult.success,
         data: bill,
+        total_page: count
       });
     }
   } catch (error) {
@@ -64,7 +69,7 @@ module.exports.getStatusSuccess = async (req, res, next) => {
   try {
     const regex = new RegExp(req.query.status, "i");
     const statusBill = await Bill.find({ status: regex });
-    if (statusBill !== "Success") {
+    if (statusBill !== "success") {
       throw { error: errorResult.notFound };
     } else {
       return res.json({
@@ -75,48 +80,6 @@ module.exports.getStatusSuccess = async (req, res, next) => {
   } catch (error) {
     return res.json(error);
   }
-};
-
-//CREATE BILL
-module.exports.createBill = async (req, res, next) => {
-  // const client = await mongo.connect("mongodb+srv://Vexere:6E676F647563687579@cluster0.g74ap.mongodb.net/fs10-Vexere?retryWrites=true&w=majority",
-  //     {
-  //         useNewUrlParser: true,
-  //         useUnifiedTopology: true
-  //     })
-  // const session = client.startTransaction()
-  // session.startTransaction()
-  // const transactionOptions = {
-  //     readPreference: "primary",
-  //     readConcern: { level: "local" },
-  //     writeConcern: { w: "majority" }
-  // };
-  // try {
-  //     const { cinemaId, userId, movieId, theatersId, ticketId } = req.body
-  //     const bill = await Bill.create({
-  //         cinemaId, userId, movieId, theatersId, ticketId
-  //     })
-  //     await session.withTransaction(async () => {
-  //         const coll1 = client.db("fs10-Vexere").collection("Bill");
-  //         await coll1.insertOne(
-  //             { cinema_id: cinemaId },
-  //             { user_id: userId },
-  //             { movie_id: movieId },
-  //             { theaters_id: theatersId },
-  //             { ticket_id: ticketId },
-  //             { session }
-  //         );
-  //         return res.json({
-  //             message: errorResult.success,
-  //             data: bill
-  //         })
-  //     }, transactionOptions);
-  // } catch (error) {
-  //     return res.json(error)
-  // } finally {
-  //     await session.endSession();
-  //     await client.close();
-  // }
 };
 
 //DELETE BILL
