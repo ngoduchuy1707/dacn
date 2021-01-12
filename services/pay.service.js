@@ -176,14 +176,31 @@ module.exports.getPaymentReturn = async (req, res, next) => {
 
     delete vnp_Params["vnp_SecureHash"];
     delete vnp_Params["vnp_SecureHashType"];
+    function sortObject(o) {
+      let sorted = {},
+        key,
+        a = [];
 
+      for (key in o) {
+        if (o.hasOwnProperty(key)) {
+          a.push(key);
+        }
+      }
+
+      a.sort();
+
+      for (key = 0; key < a.length; key++) {
+        sorted[a[key]] = o[a[key]];
+      }
+      return sorted;
+    }
     vnp_Params = sortObject(vnp_Params);
 
     var signData =
       secretKey + querystring.stringify(vnp_Params, { encode: false });
 
     var checkSum = sha256(signData);
-
+    console.log("ressponse", vnp_Params);
     if (secureHash !== checkSum) {
       throw {
         error: "Transaction failed",
@@ -191,7 +208,7 @@ module.exports.getPaymentReturn = async (req, res, next) => {
     }
     return res.json({
       message: errorResult.success,
-      data: vnp_Params["vnp_ResponseCode"],
+      data: vnp_Params["vnp_TmnCode"],
     });
   } catch (error) {
     return res.json(error);
