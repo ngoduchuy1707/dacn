@@ -29,14 +29,6 @@ router.get(
     billService.getBillById
 );
 
-//CREATE BILL
-router.post(
-    "/bills",
-    passport.authenticate("jwt", { session: false }),
-    authorizing(["member"]),
-    billService.createBill
-);
-
 //DELETE BILL
 router.delete(
     "/bills/:billId",

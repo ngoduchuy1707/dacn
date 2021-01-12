@@ -13,7 +13,7 @@ module.exports.getBill = async (req, res, next) => {
       Bill.find().populate({ path: 'ticket_id' }),
       Bill.countDocuments()
     ])
-console.log("ngo duc huy");
+    console.log("ngo duc huy");
     if (!bill) {
       throw { error: errorResult.badRequest };
     } else {
