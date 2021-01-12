@@ -55,7 +55,6 @@ app.use("/api/admin", adminController);
 app.use("/api", categoryController);
 app.use("/api", billController);
 app.use("/api", ticketController);
-//app.use("/api", tixController);
 app.use("/api", foodController);
 app.use("/api", sessionController);
 app.use("/api", payController);
