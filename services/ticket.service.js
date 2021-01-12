@@ -13,7 +13,7 @@ const { Food } = require("../models/food.model");
 module.exports.getTicket = async (req, res, next) => {
   try {
     const [ticket, count] = await Promise.all([
-      Ticket.find().populate({ path: 'user_id foodId', select: 'email fullName food_Name' }),
+      Ticket.find().populate({ path: 'user_id foodId sessionId', select: 'email fullName food_Name movie_id theaters_id cinema_id time date' }),
       Ticket.countDocuments(),
     ])
 
@@ -37,7 +37,7 @@ module.exports.getTicket = async (req, res, next) => {
 module.exports.getTicketId = async (req, res, next) => {
   try {
     const { ticketId } = req.params;
-    const ticket = await Ticket.findById(ticketId).populate({ path: 'user_id foodId', select: 'email fullName food_Name' });
+    const ticket = await Ticket.findById(ticketId).populate({ path: 'user_id foodId sessionId', select: 'email fullName food_Name movie_id theaters_id cinema_id time date' });
     if (!ticket) {
       throw {
         error: errorResult.notFound,
